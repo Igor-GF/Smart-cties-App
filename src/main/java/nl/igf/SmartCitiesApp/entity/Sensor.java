@@ -2,6 +2,7 @@ package nl.igf.SmartCitiesApp.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Entity
@@ -17,7 +18,7 @@ public class Sensor {
 
     private String description;
 
-    @NotBlank(message = "City is mandatory")
+    @NotNull(message = "City is mandatory")
     @ManyToOne
     private City city;
 }

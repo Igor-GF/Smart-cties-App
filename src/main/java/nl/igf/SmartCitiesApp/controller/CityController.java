@@ -1,7 +1,7 @@
 package nl.igf.SmartCitiesApp.controller;
 
 import jakarta.validation.Valid;
-import nl.igf.SmartCitiesApp.entity.City;
+import nl.igf.SmartCitiesApp.dto.CityDTO;
 import nl.igf.SmartCitiesApp.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +18,26 @@ public class CityController {
     private CityService cityService;
 
     @GetMapping
-    public List<City> getAllCities() {
+    public List<CityDTO> getAllCities() {
         return cityService.getAllCities();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<City> getCityById(@PathVariable long id) {
-        Optional<City> cityById = cityService.getCityById(id);
+    public ResponseEntity<CityDTO> getCityById(@PathVariable long id) {
+        Optional<CityDTO> cityById = cityService.getCityById(id);
         return cityById.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/add")
-    public City addCity(@Valid @RequestBody City city) {
-        return cityService.addCity(city);
+    public ResponseEntity<CityDTO> addCity(@Valid @RequestBody CityDTO cityDTO) {
+        CityDTO createdCity = cityService.addCity(cityDTO);
+        return ResponseEntity.status(200).body(createdCity);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<City> updateCity(@PathVariable long id, @Valid @RequestBody City cityDetails) {
-        City updatedCity = cityService.updateCity(id, cityDetails);
+    public ResponseEntity<CityDTO> updateCity(@PathVariable long id, @Valid @RequestBody CityDTO cityDetails) {
+        CityDTO updatedCity = cityService.updateCity(id, cityDetails);
         if (updatedCity != null) {
             return ResponseEntity.ok(updatedCity);
         } else {
@@ -45,7 +46,8 @@ public class CityController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteCity(@PathVariable long id) {
+    public ResponseEntity<Void> deleteCity(@PathVariable long id) {
         cityService.deleteCity(id);
+        return ResponseEntity.noContent().build();
     }
 }

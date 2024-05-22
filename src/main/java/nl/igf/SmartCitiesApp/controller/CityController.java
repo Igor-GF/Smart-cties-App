@@ -1,5 +1,6 @@
 package nl.igf.SmartCitiesApp.controller;
 
+import jakarta.validation.Valid;
 import nl.igf.SmartCitiesApp.entity.City;
 import nl.igf.SmartCitiesApp.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,12 @@ public class CityController {
     }
 
     @PostMapping("/add")
-    public City addCity(@RequestBody City city) {
+    public City addCity(@Valid @RequestBody City city) {
         return cityService.addCity(city);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<City> updateCity(@PathVariable long id, @RequestBody City cityDetails) {
+    public ResponseEntity<City> updateCity(@PathVariable long id, @Valid @RequestBody City cityDetails) {
         City updatedCity = cityService.updateCity(id, cityDetails);
         if (updatedCity != null) {
             return ResponseEntity.ok(updatedCity);

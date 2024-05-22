@@ -1,5 +1,6 @@
 package nl.igf.SmartCitiesApp.controller;
 
+import jakarta.validation.Valid;
 import nl.igf.SmartCitiesApp.entity.Sensor;
 import nl.igf.SmartCitiesApp.service.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,12 @@ public class SensorController {
     }
 
     @PostMapping("/add")
-    public Sensor addSensor(@RequestBody Sensor sensor) {
+    public Sensor addSensor(@Valid @RequestBody Sensor sensor) {
         return sensorService.addSensor(sensor);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Sensor> updateSensor(@PathVariable long id, @RequestBody Sensor sensorDetails) {
+    public ResponseEntity<Sensor> updateSensor(@PathVariable long id, @Valid @RequestBody Sensor sensorDetails) {
         Sensor updatedSensor = sensorService.updateSensor(id, sensorDetails);
         if (updatedSensor != null) {
             return ResponseEntity.ok(updatedSensor);

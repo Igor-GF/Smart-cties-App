@@ -18,8 +18,12 @@ public class CityController {
     private CityService cityService;
 
     @GetMapping
-    public List<CityDTO> getAllCities() {
-        return cityService.getAllCities();
+    public List<CityDTO> getAllCities(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "name") String sortBy
+    ) {
+        return cityService.getAllCities(page, size, sortBy);
     }
 
     @GetMapping("/{id}")

@@ -6,6 +6,10 @@ import nl.igf.SmartCitiesApp.entity.Sensor;
 import nl.igf.SmartCitiesApp.repository.CityRepo;
 import nl.igf.SmartCitiesApp.repository.SensorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +25,10 @@ public class SensorService {
     @Autowired
     private CityRepo cityRepo;
 
-    public List<SensorDTO> getAllSensors() {
-        return sensorRepo.findAll().stream()
+    public List<SensorDTO> getAllSensors(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<Sensor> sensorsPage = sensorRepo.findAll(pageable);
+        return sensorsPage.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

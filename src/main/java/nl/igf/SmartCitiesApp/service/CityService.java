@@ -4,6 +4,10 @@ import nl.igf.SmartCitiesApp.dto.CityDTO;
 import nl.igf.SmartCitiesApp.entity.City;
 import nl.igf.SmartCitiesApp.repository.CityRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +21,11 @@ public class CityService {
     @Autowired
     private CityRepo cityRepo;
 
-    public List<CityDTO> getAllCities() {
-        return cityRepo.findAll().stream()
-                .map(city -> this.convertToDTO(city))
+    public List<CityDTO> getAllCities(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<City> citiesPage = cityRepo.findAll(pageable);
+        return citiesPage.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 

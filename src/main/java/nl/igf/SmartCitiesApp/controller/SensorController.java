@@ -18,8 +18,12 @@ public class SensorController {
     private SensorService sensorService;
 
     @GetMapping
-    public List<SensorDTO> getAllSensors() {
-        return sensorService.getAllSensors();
+    public List<SensorDTO> getAllSensors(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "type") String sortBy
+    ) {
+        return sensorService.getAllSensors(page, size, sortBy);
     }
 
     @GetMapping("/{id}")

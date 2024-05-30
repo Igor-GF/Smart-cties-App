@@ -50,12 +50,9 @@ public class SensorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SensorDTO> updateSensor(@PathVariable long id, @Valid @RequestBody SensorDTO sensorDTO) {
-        SensorDTO updatedSensor = sensorService.updateSensor(id, sensorDTO);
-        if (updatedSensor != null) {
-            return ResponseEntity.ok(updatedSensor);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Optional<SensorDTO> updatedSensor = sensorService.updateSensor(id, sensorDTO);
+        return updatedSensor.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

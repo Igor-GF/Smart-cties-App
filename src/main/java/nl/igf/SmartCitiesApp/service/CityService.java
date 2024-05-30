@@ -76,18 +76,24 @@ public class CityService {
         return convertToDTO(savedCity);
     }
 
-    public CityDTO updateCity(Long id, CityDTO cityDDTO) {
-        Optional<City> cityOptional = cityRepo.findById(id);
-        if (cityOptional.isPresent()) {
-            City city = cityOptional.get();
-            city.setName(cityDDTO.getName());
-            city.setStateOrProvince((cityDDTO.getStateOrProvince()));
-            city.setCountry(cityDDTO.getCountry());
+    public Optional<CityDTO> updateCity(Long id, CityDTO cityDTO) {
+        Optional<City> cityOpt = cityRepo.findById(id);
+        if (cityOpt.isPresent()) {
+            City city = cityOpt.get();
+            city.setName(cityDTO.getName());
+            city.setStateOrProvince(cityDTO.getStateOrProvince());
+            city.setCountry(cityDTO.getCountry());
             City updatedCity = cityRepo.save(city);
-            return convertToDTO(updatedCity);
-        } else {
-            throw new NoSuchElementException("This city does not exist");
+
+            CityDTO updatedCityDTO = new CityDTO();
+            updatedCityDTO.setId(updatedCity.getId());
+            updatedCityDTO.setName(updatedCity.getName());
+            updatedCityDTO.setStateOrProvince(updatedCity.getStateOrProvince());
+            updatedCityDTO.setCountry(updatedCity.getCountry());
+
+            return Optional.of(updatedCityDTO);
         }
+        return Optional.empty();
     }
 
     public void deleteCity(long id) {

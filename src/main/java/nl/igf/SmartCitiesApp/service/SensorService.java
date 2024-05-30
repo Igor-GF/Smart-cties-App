@@ -70,19 +70,22 @@ public class SensorService {
         return convertToDTO(savedSensor);
     }
 
-    public SensorDTO updateSensor(Long id, SensorDTO sensorDTO) {
-        Optional<Sensor> sensorOptional = sensorRepo.findById(id);
-        if (sensorOptional.isPresent()) {
-            Sensor sensor = sensorOptional.get();
+    public Optional<SensorDTO> updateSensor(Long id, SensorDTO sensorDTO) {
+        Optional<Sensor> sensorOpt = sensorRepo.findById(id);
+        if (sensorOpt.isPresent()) {
+            Sensor sensor = sensorOpt.get();
             sensor.setType(sensorDTO.getType());
             sensor.setDescription(sensorDTO.getDescription());
-            Optional<City> cityOptional = cityRepo.findById(sensorDTO.getCityId());
-            cityOptional.ifPresent(sensor::setCity);
-            Sensor updatedCity = sensorRepo.save(sensor);
-            return convertToDTO(updatedCity);
-        } else {
-            throw new NoSuchElementException("This sensor does not exist");
+            Sensor updatedSensor = sensorRepo.save(sensor);
+
+            SensorDTO updatedSensorDTO = new SensorDTO();
+            updatedSensorDTO.setId(updatedSensor.getId());
+            updatedSensorDTO.setType(updatedSensor.getType());
+            updatedSensorDTO.setDescription(updatedSensor.getDescription());
+
+            return Optional.of(updatedSensorDTO);
         }
+        return Optional.empty();
     }
 
     public void deleteSensor(Long id) {

@@ -1,6 +1,7 @@
 package nl.igf.SmartCitiesApp.controller;
 
 import jakarta.validation.Valid;
+import jdk.jshell.Snippet;
 import nl.igf.SmartCitiesApp.dto.CityDTO;
 import nl.igf.SmartCitiesApp.dto.CityWithSensorsDTO;
 import nl.igf.SmartCitiesApp.service.CityService;
@@ -52,12 +53,8 @@ public class CityController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<CityDTO> updateCity(@PathVariable long id, @Valid @RequestBody CityDTO cityDetails) {
-        CityDTO updatedCity = cityService.updateCity(id, cityDetails);
-        if (updatedCity != null) {
-            return ResponseEntity.ok(updatedCity);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Optional<CityDTO> updatedCity = cityService.updateCity(id, cityDetails);
+        return updatedCity.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/delete/{id}")

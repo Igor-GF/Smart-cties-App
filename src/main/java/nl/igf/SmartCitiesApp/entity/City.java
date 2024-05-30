@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Data
 public class City {
@@ -22,4 +24,7 @@ public class City {
 
     @NotBlank(message = "Country is mandatory")
     private String country;
+
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Sensor> sensors;
 }

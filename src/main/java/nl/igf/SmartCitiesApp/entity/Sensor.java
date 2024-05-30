@@ -20,5 +20,6 @@ public class Sensor {
 
     @NotNull(message = "City is mandatory")
     @ManyToOne
+    @JoinColumn(name = "city_id")
     private City city;
 }

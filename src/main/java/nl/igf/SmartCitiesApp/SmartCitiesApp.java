@@ -9,5 +9,4 @@ public class SmartCitiesApp {
 	public static void main(String[] args) {
 		SpringApplication.run(SmartCitiesApp.class, args);
 	}
-
 }

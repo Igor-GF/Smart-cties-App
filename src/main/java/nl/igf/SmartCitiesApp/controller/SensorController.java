@@ -17,13 +17,22 @@ public class SensorController {
     @Autowired
     private SensorService sensorService;
 
+    @PostMapping("/city/{cityId}")
+    public ResponseEntity<SensorDTO> addSensorToCity(@PathVariable Long cityId, @Valid @RequestBody SensorDTO sensorDTO) {
+        Optional<SensorDTO> createdSensor = sensorService.addSensorToCity(cityId, sensorDTO);
+        return createdSensor.map(sensor -> ResponseEntity.status(201).body(sensor))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping
     public List<SensorDTO> getAllSensors(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "type") String sortBy
+        @RequestParam(defaultValue = "type") String sortBy,
+        @RequestParam(required = false) String type,
+        @RequestParam(required = false) Long cityId
     ) {
-        return sensorService.getAllSensors(page, size, sortBy);
+        return sensorService.getAllSensors(page, size, sortBy, type, cityId);
     }
 
     @GetMapping("/{id}")

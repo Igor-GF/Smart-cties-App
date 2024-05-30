@@ -5,11 +5,13 @@ import nl.igf.SmartCitiesApp.entity.City;
 import nl.igf.SmartCitiesApp.entity.Sensor;
 import nl.igf.SmartCitiesApp.repository.CityRepo;
 import nl.igf.SmartCitiesApp.repository.SensorRepo;
+import nl.igf.SmartCitiesApp.specification.SensorSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,9 +27,34 @@ public class SensorService {
     @Autowired
     private CityRepo cityRepo;
 
-    public List<SensorDTO> getAllSensors(int page, int size, String sortBy) {
+    public Optional<SensorDTO> addSensorToCity(Long cityId, SensorDTO sensorDTO) {
+        Optional<City> cityOpt = cityRepo.findById(cityId);
+        if (cityOpt.isPresent()) {
+            City city = cityOpt.get();
+            Sensor sensor = new Sensor();
+            sensor.setType(sensorDTO.getType());
+            sensor.setDescription(sensorDTO.getDescription());
+            sensor.setCity(city);
+            Sensor savedSensor = sensorRepo.save(sensor);
+
+            SensorDTO savedSensorDTO = new SensorDTO();
+            savedSensorDTO.setId(savedSensor.getId());
+            savedSensorDTO.setType(savedSensor.getType());
+            savedSensorDTO.setDescription(savedSensor.getDescription());
+
+            return Optional.of(savedSensorDTO);
+        }
+        return Optional.empty();
+    }
+
+    public List<SensorDTO> getAllSensors(int page, int size, String sortBy, String type, Long cityId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<Sensor> sensorsPage = sensorRepo.findAll(pageable);
+        Specification<Sensor> spec = Specification.where(null);
+
+        if (type != null && !type.isEmpty()) spec = spec.and(SensorSpecification.hasType(type));
+        if (cityId != null) spec = spec.and(SensorSpecification.hasCityId(cityId));
+
+        Page<Sensor> sensorsPage = sensorRepo.findAll(spec, pageable);
         return sensorsPage.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

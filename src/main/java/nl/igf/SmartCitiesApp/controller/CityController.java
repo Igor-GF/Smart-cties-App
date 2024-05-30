@@ -2,6 +2,7 @@ package nl.igf.SmartCitiesApp.controller;
 
 import jakarta.validation.Valid;
 import nl.igf.SmartCitiesApp.dto.CityDTO;
+import nl.igf.SmartCitiesApp.dto.CityWithSensorsDTO;
 import nl.igf.SmartCitiesApp.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,23 @@ public class CityController {
     @Autowired
     private CityService cityService;
 
+    @GetMapping("/{id}/sensors")
+    public ResponseEntity<CityWithSensorsDTO> getCityWithSensors(@PathVariable Long id) {
+        Optional<CityWithSensorsDTO> city = cityService.getCityWithSensors(id);
+        return city.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping
     public List<CityDTO> getAllCities(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "name") String sortBy
+        @RequestParam(defaultValue = "name") String sortBy,
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String country,
+        @RequestParam(required = false) String stateOrProvince
     ) {
-        return cityService.getAllCities(page, size, sortBy);
+        return cityService.getAllCities(page, size, sortBy, name, country, stateOrProvince);
     }
 
     @GetMapping("/{id}")

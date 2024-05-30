@@ -1,15 +1,20 @@
 package nl.igf.SmartCitiesApp.service;
 
 import nl.igf.SmartCitiesApp.dto.CityDTO;
+import nl.igf.SmartCitiesApp.dto.CityWithSensorsDTO;
+import nl.igf.SmartCitiesApp.dto.SensorDTO;
 import nl.igf.SmartCitiesApp.entity.City;
 import nl.igf.SmartCitiesApp.repository.CityRepo;
+import nl.igf.SmartCitiesApp.specification.CitySpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -21,9 +26,41 @@ public class CityService {
     @Autowired
     private CityRepo cityRepo;
 
-    public List<CityDTO> getAllCities(int page, int size, String sortBy) {
+    public Optional<CityWithSensorsDTO> getCityWithSensors(Long id) {
+        Optional<City> cityOptional = cityRepo.findByIdWithSensors(id);
+        if (cityOptional.isPresent()) {
+            City city = cityOptional.get();
+            CityWithSensorsDTO cityWithSensorsDTO = new CityWithSensorsDTO();
+            cityWithSensorsDTO.setId(city.getId());
+            cityWithSensorsDTO.setName(city.getName());
+            cityWithSensorsDTO.setStateOrProvince(city.getStateOrProvince());
+            cityWithSensorsDTO.setCountry(city.getCountry());
+
+            List<SensorDTO> sensors = city.getSensors().stream()
+                    .map(sensor -> {
+                        var sensorDTO = new SensorDTO();
+                        sensorDTO.setId(sensor.getId());
+                        sensorDTO.setType(sensor.getType());
+                        sensorDTO.setDescription(sensor.getDescription());
+                        return sensorDTO;
+                    })
+                    .collect(Collectors.toList());
+
+            cityWithSensorsDTO.setSensors(sensors);
+            return Optional.of(cityWithSensorsDTO);
+        }
+        return Optional.empty();
+    }
+
+    public List<CityDTO> getAllCities(int page, int size, String sortBy, String name, String country, String stateOrProvince) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<City> citiesPage = cityRepo.findAll(pageable);
+        Specification<City> spec = Specification.where(null);
+
+        if (name != null && !name.isEmpty()) spec = spec.and(CitySpecification.hasName(name));
+        if (country != null && !country.isEmpty()) spec = spec.and(CitySpecification.hasCountry(country));
+        if (stateOrProvince != null && !stateOrProvince.isEmpty()) spec = spec.and(CitySpecification.hasStateOrProvince(stateOrProvince));
+
+        Page<City> citiesPage = cityRepo.findAll(spec, pageable);
         return citiesPage.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
